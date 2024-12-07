@@ -1,28 +1,56 @@
-# index_manager.py
-# Initial framework for interactive B-Tree manager with a menu system.
+#session 2: Basic File Management
+#Added support for 'create', 'open', and 'quit' commands.
+#Ensures files are created with the correct magic number.
+#validates magic number when opening files.
+# allows users to quit the program gracefully.
+
+#date; dec6 time: 7;56 session 2
+
+import os
+
+MAGIC_NUMBER = b'4337PRJ3'
 
 def main():
-    print("Welcome to the B-Tree Index Manager!")
+    open_file = None
+
     while True:
-        print("\nCommands:")
-        print("CREATE | OPEN | INSERT | SEARCH | PRINT | QUIT")
+        print("\nMenu:")
+        print("CREATE - Create a new index file")
+        print("OPEN - Open an existing index file")
+        print("QUIT - Exit the program")
         command = input("Enter a command: ").strip().lower()
 
         if command == "create":
-            print("Create command selected (not yet implemented).")
+            filename = input("Enter filename: ").strip()
+            if os.path.exists(filename):
+                overwrite = input(f"{filename} already exists. Overwrite? (yes/no): ").strip().lower()
+                if overwrite != "yes":
+                    print("Operation aborted.")
+                    continue
+            with open(filename, 'wb') as file:
+                file.write(MAGIC_NUMBER + b'\x00' * 504)  # Write header
+            print(f"Created {filename}.")
+            open_file = filename
+
         elif command == "open":
-            print("Open command selected (not yet implemented).")
-        elif command == "insert":
-            print("Insert command selected (not yet implemented).")
-        elif command == "search":
-            print("Search command selected (not yet implemented).")
-        elif command == "print":
-            print("Print command selected (not yet implemented).")
+            filename = input("Enter filename: ").strip()
+            if not os.path.exists(filename):
+                print(f"Error: {filename} does not exist.")
+                continue
+            with open(filename, 'rb') as file:
+                magic = file.read(8)
+                if magic != MAGIC_NUMBER:
+                    print(f"Error: {filename} is not a valid index file.")
+                else:
+                    print(f"Opened {filename}.")
+                    open_file = filename
+
         elif command == "quit":
-            print("Exiting program.")
+            print("Exiting...")
             break
+
         else:
-            print("Unknown command. Please try again.")
+            print("Invalid command. Try again.")
 
 if __name__ == "__main__":
     main()
